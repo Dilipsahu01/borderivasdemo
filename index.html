@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perimeter Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#edf2f6;
+  --bg-strong:#e3eaf0;
+  --panel:#f7f9fb;
+  --panel-alt:#eef4f8;
+  --card:#ffffff;
+  --ink:#132330;
+  --muted:#5c6d7d;
+  --line:#d9e2ea;
+  --blue:#1e5fd0;
+  --blue-soft:#dfeafc;
+  --green:#28745e;
+  --green-soft:#dff2ea;
+  --amber:#b7751e;
+  --amber-soft:#f7e9c8;
+  --red:#b95045;
+  --red-soft:#f9e0dc;
+  --shadow:0 10px 28px rgba(17, 31, 46, 0.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-strong) 100%);color:var(--ink);font:14px/1.5 'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1280px;margin:0 auto;padding:28px 24px 40px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;padding:6px 0 18px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.7px;color:var(--ink)}
+.sub{color:var(--muted);margin-top:4px;font-size:13px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font-size:12px;color:var(--muted);padding:6px 10px;border:1px solid var(--line);background:var(--panel);border-radius:999px;font-weight:600;letter-spacing:.02em}
+.btn{font:inherit;font-weight:600;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 1px 0 rgba(19,35,48,.02)}
+.btn:hover{background:#f3f7fa;border-color:#cbd8e2}
+.btn:focus-visible,tr:focus-visible{outline:2px solid rgba(30,95,208,.45);outline-offset:2px}
+.btn.on{background:var(--ink);color:#f7fbff;border-color:var(--ink)}
+
+.ledger{display:flex;flex-wrap:wrap;margin:0;padding:18px 0;border-bottom:1px solid var(--line)}
+.ledger div{flex:1 1 150px;padding:0 20px;border-left:1px solid var(--line)}
+.ledger div:first-child{padding-left:0;border-left:0}
+.ledger b{display:block;font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.6px}
+.ledger span{color:var(--muted);font-size:13px}
+.ledger .warn b{color:var(--red)}
+
+.row{display:grid;gap:22px;margin-top:22px}
+.r1{grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)}
+.r2{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+@media(max-width:920px){.r1,.r2{grid-template-columns:1fr}}
+h2{font-size:16px;font-weight:700;margin:0 0 2px;color:var(--ink)}
+.note{color:var(--muted);font-size:13px;margin:0 0 12px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.panel.soft{background:transparent;border:0;border-left:1px solid var(--line);border-radius:0;padding:2px 0 2px 22px;box-shadow:none}
+@media(max-width:920px){.panel.soft{border-left:0;padding:0}}
+
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:0 10px 10px 0;border-bottom:1px solid var(--line)}
+td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer;transition:background .15s ease}
+tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--blue);padding-left:10px}
+tbody tr:hover{background:var(--panel-alt)}
+.nm{font-weight:700}
+.loc{color:var(--muted);font-size:12.5px}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.01em}
+.ok{background:var(--green-soft);color:var(--green)}
+.tg{background:var(--amber-soft);color:var(--amber)}
+.al{background:var(--red-soft);color:var(--red)}
+.strip{display:flex;gap:2px;align-items:center}
+.strip i{display:block;width:5px;height:18px;border-radius:2px;background:var(--green)}
+.strip i.m{background:var(--red);height:18px}
+.hot{color:var(--red);font-weight:700}
+
+.feed{list-style:none;margin:0;padding:0}
+.feed li{padding:10px 0 10px 12px;border-bottom:1px solid var(--line);border-left:3px solid var(--green)}
+.feed li.t{border-left-color:var(--amber)}
+.feed li.a{border-left-color:var(--red)}
+.feed li:last-child{border-bottom:0}
+.feed .ti{font-weight:700}
+.feed .mt{color:var(--muted);font-size:12.5px}
+.seal{font-family:ui-monospace,'SF Mono',Consolas,monospace;font-size:12px;color:var(--muted)}
+.empty{color:var(--muted);padding:14px 0}
+
+svg text{font:11.5px 'Inter',system-ui,sans-serif;fill:var(--muted)}
+.glog{list-style:none;padding:0;margin:10px 0 0;font-size:13px;color:var(--muted)}
+.glog li{padding:3px 0}
+.glog b{color:var(--ink);font-weight:600}
+
+.blocks{width:100%;border-collapse:collapse;min-width:0;margin-top:6px}
+.blocks td{padding:8px 10px 8px 0}
+.res{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--panel-alt);min-height:42px;border:1px solid var(--line)}
+.res.good{background:var(--green-soft);color:var(--green);border-color:rgba(40,116,94,.15)}
+.res.bad{background:var(--red-soft);color:var(--red);border-color:rgba(185,80,69,.15)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+footer{margin-top:30px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+
+.r2{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.ledger em{font-style:normal}
+.ledger .pn{display:block;font-weight:700;color:var(--ink);font-size:14px;margin-bottom:3px}
+.st{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;font-weight:600;color:var(--green);margin-top:6px}
+.st:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green)}
+.st.warn{color:var(--red)}.st.warn:before{background:var(--red)}
+.banner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--green-soft);border-left:6px solid var(--green);box-shadow:var(--shadow)}
+.banner.bad{background:var(--red-soft);border-left-color:var(--red);color:#642f2c}
+.banner h2{font-size:18px;margin:0}
+.banner p{margin:2px 0 0}
+.banner .when{font-size:12.5px;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px 20px;margin-bottom:18px}
+.big{display:block;font-size:30px;font-weight:700;letter-spacing:-.6px;line-height:1.15}
+.big.sm{font-size:17px;line-height:1.55;letter-spacing:0}
+.facts small{display:block;color:var(--muted);font-size:13px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.flow>div{position:relative;padding:12px 14px;background:var(--panel-alt);border-radius:10px;margin-right:24px;border:1px solid var(--line)}
+.flow>div:last-child{margin-right:0}
+.flow>div:not(:last-child):after{content:'';position:absolute;right:-18px;top:50%;width:18px;height:2px;background:var(--line)}
+.flow>div:not(:last-child):before{content:'';position:absolute;right:-24px;top:calc(50% - 5px);border:5px solid transparent;border-left:7px solid var(--line);border-right:0}
+.flow b{display:block;margin-bottom:2px;font-size:13px}
+.flow span{display:block;color:var(--muted);font-size:12.5px;margin-bottom:10px}
+.why{margin:14px 0 0;color:var(--muted);font-size:13px}
+.ev{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:26px}
+.gd{color:var(--green);font-weight:600}.bd{color:var(--red);font-weight:600}
+@media(max-width:920px){.ev{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr;row-gap:14px}.flow>div{margin-right:0}.flow>div:after,.flow>div:before{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Perimeter Ops</h1>
+      <div class="sub">Field node integrity dashboard · <span id="clock"></span></div>
+    </div>
+    <div class="tools">
+      <span class="tag">Live demo</span>
+      <button class="btn" id="bBlind">Blind node</button>
+      <button class="btn" id="bTamper">Edit record</button>
+    </div>
+  </header>
+
+  <section id="banner" class="banner" aria-label="Security status"></section>
+  <section class="ledger" id="pil" aria-label="The four pillars"></section>
+
+  <div class="row r1">
+    <section class="panel">
+      <h2>Node heartbeats</h2>
+      <p class="note">Each bar is one signed all clear. A red bar is a missed one.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Node</th><th>Status</th><th>Model</th><th>Board temp</th><th>Frame rate</th><th>Last 30 heartbeats</th><th>Last seen</th></tr></thead>
+          <tbody id="nodes"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel soft">
+      <h2>Detections and proof</h2>
+      <p class="note">Each alert is detected, tracked, sealed and signed by the node.</p>
+      <ul class="feed" id="feed"></ul>
+    </section>
+  </div>
+
+  <div class="row r2">
+    <section class="panel">
+      <h2>Evidence integrity</h2>
+      <p class="note">Every alert and all clear is sealed at the node. Each check covers the latest 8 anchored roots.</p>
+      <div class="facts" id="evn"></div>
+      <div class="flow" id="flow"></div>
+      <p class="why">Why it matters: if anyone edits a record after the fact, its hash changes, the root stops matching, and the check fails. Alerts stay usable as evidence.</p>
+      <div class="acts"><button class="btn" id="bVerify">Verify all records</button></div>
+      <div class="res" id="vres">Checks also run automatically every ten seconds.</div>
+    </section>
+    <section class="panel soft">
+      <h2>Heartbeat integrity</h2>
+      <p class="note">Nodes sign an all clear every two seconds. A silent node could be blinded or fed a looped video, so silence is treated as an attack.</p>
+      <div class="facts" id="hbi"></div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:22px">
+    <h2>Model status</h2>
+    <p class="note" id="chTitle"></p>
+    <div class="ev">
+      <div><div class="facts" id="mdl"></div><ul class="glog" id="glog"></ul></div>
+      <div id="chart"></div>
+    </div>
+  </section>
+
+  <footer>Demo data is generated in-browser for prototype review. Figures are illustrative and not field measurements. RSA signing is handled locally, while the blockchain anchor remains simulated for presentation purposes.</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const hms=d=>pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+
+// SHA-256 (falls back to a simple hash if crypto.subtle is unavailable)
+async function H(s){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0').repeat(8)}
+}
+async function merkle(l){
+  if(!l.length)return '';
+  while(l.length>1){const n=[];for(let i=0;i<l.length;i+=2)n.push(await H(l[i]+(l[i+1]||l[i])));l=n}
+  return l[0];
+}
+
+const hot=[69,78,80,71,77,74];
+const nodes=[
+ ['N-01','Sector 1, north fence'],['N-02','Sector 1, river bend'],['N-03','Sector 2, ridge post'],
+ ['N-04','Sector 2, gate road'],['N-05','Sector 3, dry channel'],['N-06','Sector 3, watchtower']
+].map(([id,name],i)=>({id,name,hot:hot[i],temp:56+Math.random()*10,model:'Full',fps:30,hb:Array(30).fill(1),last:Date.now(),blind:false,alarmed:false,until:0,th:[]}));
+
+let sel=1,ticks=0,feed=[],glog=[],pending=[],blocks=[],height=0,records=0,evt=0,switches=0;
+let vs={n:0,tam:0,bad:0,list:[],checked:null};
+const RSA={name:'RSA-PSS',saltLength:32},enc=s=>new TextEncoder().encode(s);
+async function genKey(){try{return await crypto.subtle.generateKey({name:'RSA-PSS',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},false,['sign','verify'])}catch(e){return null}}
+nodes.forEach(async n=>{n.key=await genKey()});
+async function sigOK(l){if(!l.key||!l.sig)return true;try{return await crypto.subtle.verify(RSA,l.key.publicKey,l.sig,enc(l.text))}catch(e){return true}}
+
+function log(m){glog.unshift({t:new Date(),m});glog=glog.slice(0,5)}
+
+async function raise(n){
+  n.until=Date.now()+9000;
+  const T=['Person near fence','Person crawling','Small drone','Boat in channel'];
+  const ty=T[Math.random()*4|0],c=.62+Math.random()*.35,first=new Date();
+  const id='EVT-'+String(++evt).padStart(4,'0');
+  const text=`${id}|${n.id}|${ty}|${c.toFixed(2)}|${first.toISOString()}`;
+  const seal=await H(text);
+  let sig=null;try{if(n.key)sig=await crypto.subtle.sign(RSA,n.key.privateKey,enc(text))}catch(e){}
+  const leaf={id,text,seal,sig,key:n.key,ok:true};
+  pending.push(leaf);records++;
+  const f={t:first,k:'t',n,ty,c,id,leaf};n.target=f;
+  feed.unshift(f);feed=feed.slice(0,10);
+}
+
+let anchoring=false;
+async function anchor(){
+  if(anchoring)return;anchoring=true;
+  const ts=new Date().toISOString();
+  for(const n of nodes){if(!n.blind){const text=`${n.id}|all clear|${ts}`;pending.push({id:'HB-'+String(++records).padStart(4,'0'),text,seal:await H(text)})}}
+  const leaves=pending.splice(0);
+  if(leaves.length){
+    const root=await merkle(leaves.map(l=>l.seal));
+    blocks.unshift({height:++height,root,leaves,t:new Date()});
+    blocks=blocks.slice(0,8);
+  }
+  anchoring=false;verify();
+}
+
+function tick(){
+  const t=Date.now();ticks++;
+  nodes.forEach(n=>{
+    if(!n.blind){
+      const target=n.model==='Full'?n.hot:58;
+      n.temp+=(target-n.temp)*.05+(Math.random()-.5)*1.1;
+      n.fps=(n.model==='Full'?28:36)+(Math.random()-.5)*2;
+      let sw=false;
+      if(n.model==='Full'&&n.temp>72){n.model='Light';sw=true}
+      else if(n.model==='Light'&&n.temp<64){n.model='Full';sw=true}
+      if(sw){switches++;log(`<b>${n.id}</b> moved to the ${n.model.toLowerCase()} model at ${n.temp.toFixed(0)} °C`)}
+      n.th.push({v:n.temp,sw});if(n.th.length>80)n.th.shift();
+      if(t>n.until&&Math.random()<.012)raise(n);
+    }
+    if(ticks%2===0){if(n.blind)n.hb.push(0);else{n.hb.push(1);n.last=t}}n.hb.shift();
+    const silent=n.blind&&t-n.last>6000;
+    if(silent&&!n.alarmed){n.alarmed=true;feed.unshift({t:new Date(),k:'a',title:'Heartbeat missing',sub:`${n.id} silent for 6 seconds. Possible blinding or a looped feed.`,seal:null});feed=feed.slice(0,10)}
+    if(!n.blind&&n.alarmed){n.alarmed=false;feed.unshift({t:new Date(),k:'s',title:'Heartbeat restored',sub:`${n.id} is reporting again`,seal:null});feed=feed.slice(0,10)}
+  });
+  if(ticks%10===0)anchor();
+  render();
+}
+
+function status(n,t){
+  if(n.blind&&t-n.last>6000)return['al','Silent, alarm'];
+  if(n.until>t)return['tg','Target detected'];
+  return['ok','All clear'];
+}
+const ago=ms=>(ms/1000).toFixed(1);
+function feedT(f,t){
+  const act=f.n.target===f&&f.n.until>t,ok=f.leaf.ok!==false,sg=f.leaf.sig;
+  return `<li class="t${ok?'':' a'}">
+    <div class="ti">${f.n.id} target detected <span class="pill ${act?'tg':'ok'}">${act?'Tracking active':'Track ended'}</span></div>
+    <div>${f.ty}, confidence ${Math.round(f.c*100)}%</div>
+    <div class="mt">${f.n.name}. First detected ${hms(f.t)}.</div>
+    <div class="mt">${f.id}, SHA-256 <span class="seal">${f.leaf.seal.slice(0,14)}</span></div>
+    <div class="mt ${ok?'gd':'bd'}">${ok?(sg?'Signature verified':'Sealed, signing unavailable'):'Signature invalid, record altered'}</div></li>`;
+}
+function render(){
+  const t=Date.now();
+  $('#clock').textContent='Updated '+hms(new Date());
+  const sil=nodes.filter(n=>n.blind&&t-n.last>6000),on=nodes.length-sil.length;
+  const tg=nodes.filter(n=>n.until>t).length,lt=nodes.filter(n=>n.model==='Light').length;
+  const inc=[...sil.map(n=>`${n.id} heartbeat missing for ${ago(t-n.last)} seconds. Possible node failure or feed interruption.`),...vs.list];
+
+  const B=$('#banner');B.className='banner'+(inc.length?' bad':'');
+  B.innerHTML=inc.length
+    ?`<div><h2>Integrity alert</h2>${inc.map(x=>`<p>${x}</p>`).join('')}</div><div class="when">Raised ${hms(new Date())}</div>`
+    :`<div><h2>All systems operational</h2><p>${on} of ${nodes.length} heartbeats verified, ${vs.tam} tampered records, ${lt} nodes shifting to protect themselves from heat.</p></div><div class="when">Last check ${vs.checked?hms(vs.checked):'pending'}</div>`;
+
+  const bad=vs.bad>0;
+  $('#pil').innerHTML=[
+    ['Detection',`${on} of ${nodes.length}`,'nodes running the detector',sil.length?'Degraded':'Operational',sil.length>0],
+    ['Tracking',tg,'targets tracked now',sil.length?'Degraded':'Operational',sil.length>0],
+    ['Integrity',`${vs.n-vs.tam} / ${vs.n}`,'records verified',bad?'Tampering found':'Sealed and verified',bad],
+    ['Thermal resilience',lt,'nodes on the light model','Adaptive',false]
+  ].map(([n,v,d,st,w])=>`<div class="${w?'warn':''}"><span class="pn">${n}</span><b>${v}</b><span>${d}</span><em class="st ${w?'warn':''}">${st}</em></div>`).join('');
+
+  $('#nodes').innerHTML=nodes.map((n,i)=>{
+    const [c,l]=status(n,t),age=Math.round((t-n.last)/1000),dead=c==='al';
+    return `<tr tabindex="0" data-i="${i}" class="${i===sel?'sel':''}">
+      <td><div class="nm">${n.id}</div><div class="loc">${n.name}</div></td>
+      <td><span class="pill ${c}">${l}</span>${c==='tg'&&n.target?`<div class="loc">${n.target.ty}, ${Math.round(n.target.c*100)}%</div>`:''}</td>
+      <td>${n.model}</td>
+      <td class="${n.temp>72?'hot':''}">${dead?'no data':n.temp.toFixed(0)+' °C'}</td>
+      <td>${dead?'no data':n.fps.toFixed(0)+' fps'}</td>
+      <td><div class="strip">${n.hb.map(v=>`<i class="${v?'':'m'}"></i>`).join('')}</div></td>
+      <td>${age<2?'just now':age+' s ago'}</td></tr>`}).join('');
+
+  $('#feed').innerHTML=feed.length?feed.map(f=>f.k==='t'?feedT(f,t):
+    `<li class="${f.k==='a'?'a':''}"><div class="ti">${f.title}</div><div class="mt">${f.sub}, ${hms(f.t)}</div></li>`).join('')
+    :'<li class="empty">No events yet. Alerts appear here as nodes report them.</li>';
+
+  const lb=blocks[0],ll=lb&&lb.leaves[lb.leaves.length-1];
+  $('#evn').innerHTML=`<div><span class="big">${vs.n-vs.tam} / ${vs.n}</span><small>records verified</small></div>
+    <div><span class="big">${height}</span><small>Merkle roots anchored</small></div>
+    <div><span class="big ${vs.tam?'hot':''}">${vs.tam}</span><small>tampered records detected</small></div>
+    <div><span class="big">${lb?hms(lb.t):'none yet'}</span><small>last anchor</small></div>`;
+  $('#flow').innerHTML=[
+    ['Event','A detection or all clear, signed by the node',ll?ll.id:'waiting'],
+    ['Hash','A SHA-256 fingerprint. Change one letter and it changes completely.',ll?ll.seal.slice(0,12):'waiting'],
+    ['Merkle root','Every fingerprint in a batch combined into one',lb?lb.root.slice(0,12):'waiting'],
+    ['Blockchain anchor','Root stored at the command centre, out of the node\'s reach',lb?'Block #'+lb.height:'waiting']
+  ].map(([a,b,c])=>`<div><b>${a}</b><span>${b}</span><code class="seal">${c}</code></div>`).join('');
+
+  const old=Math.max(...nodes.map(n=>t-n.last));
+  $('#hbi').innerHTML=`<div><span class="big">${on} / ${nodes.length}</span><small>nodes with a verified heartbeat</small></div>
+    <div><span class="big">${ago(old)} s</span><small>oldest heartbeat</small></div>
+    <div><span class="big">6 s</span><small>silence that raises an alarm</small></div>
+    <div><span class="pill ${sil.length?'al':'ok'}">${sil.length?'Compromised':'Trusted'}</span><small>trust status</small></div>`;
+
+  $('#mdl').innerHTML=`<div><span class="big">${nodes.length-lt}</span><small>nodes on the full model</small></div>
+    <div><span class="big">${lt}</span><small>nodes on the light model</small></div>
+    <div><span class="big sm">Thermal protection</span><small>reason for switching</small></div>
+    <div><span class="big">${switches}</span><small>switches this session</small></div>`;
+  $('#glog').innerHTML=glog.length?glog.map(g=>`<li>${hms(g.t)}, ${g.m}</li>`).join(''):'<li>No model switches yet.</li>';
+  drawChart();
+
+  $('#bBlind').textContent=nodes.some(n=>n.blind)?'Restore nodes':'Blind a node';
+  $('#bBlind').classList.toggle('on',nodes.some(n=>n.blind));
+  const tam=blocks.some(b=>b.leaves.some(l=>l.orig));
+  $('#bTamper').textContent=tam?'Undo edit':'Edit a record';
+  $('#bTamper').classList.toggle('on',tam);
+}
+
+function drawChart(){
+  const n=nodes[sel],W=520,Hh=190,L=34,R=8,T=10,B=22,lo=45,hi=90;
+  $('#chTitle').textContent=`Board temperature on ${n.id} (${n.name}). The node drops to the light model above 72 °C and returns below 64 °C. Click a row in the node table to switch node.`;
+  const X=i=>L+i*(W-L-R)/79,Y=v=>T+(hi-v)*(Hh-T-B)/(hi-lo);
+  const off=80-n.th.length;
+  const pts=n.th.map((p,i)=>`${X(i+off).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const dots=n.th.map((p,i)=>p.sw?`<circle cx="${X(i+off)}" cy="${Y(p.v)}" r="4.5" fill="var(--brick)"/>`:'').join('');
+  let g='';[50,60,70,80,90].forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`);
+  $('#chart').innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Board temperature over the last 80 seconds">
+    ${g}
+    <line x1="${L}" x2="${W-R}" y1="${Y(72)}" y2="${Y(72)}" stroke="var(--brick)" stroke-dasharray="4 4"/>
+    <line x1="${L}" x2="${W-R}" y1="${Y(64)}" y2="${Y(64)}" stroke="var(--slate)" stroke-dasharray="4 4"/>
+    <text x="${W-R}" y="${Y(72)-4}" text-anchor="end">drop to light model</text>
+    <text x="${W-R}" y="${Y(64)+13}" text-anchor="end">return to full model</text>
+    <polyline points="${pts}" fill="none" stroke="var(--moss)" stroke-width="2.2" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${L}" y="${Hh-5}">80 seconds ago</text><text x="${W-R}" y="${Hh-5}" text-anchor="end">now</text></svg>`;
+}
+
+async function verify(manual){
+  let n=0,tam=0,bad=[];
+  for(const b of blocks){
+    const seals=[];let tb=0;
+    for(const l of b.leaves){
+      n++;const h=await H(l.text);seals.push(h);
+      l.ok=h===l.seal&&await sigOK(l);
+      if(!l.ok){tb++;tam++;bad.push(`Record ${l.id} in block #${b.height} no longer matches its seal.`)}
+    }
+    if(!tb&&await merkle(seals)!==b.root)bad.push(`The root of block #${b.height} does not match.`);
+  }
+  vs={n,tam,bad:bad.length,list:bad,checked:new Date()};
+  if(manual){
+    const o=$('#vres');o.className='res '+(bad.length?'bad':'good');
+    o.textContent=!blocks.length?'No roots anchored yet. Try again in a few seconds.':bad.length?'Tampering found. '+bad[0]:`All ${n} records across ${blocks.length} roots match their seals.`;
+    if(!blocks.length)o.className='res';
+  }
+  render();
+}
+
+$('#nodes').addEventListener('click',e=>{const r=e.target.closest('tr');if(r){sel=+r.dataset.i;render()}});
+$('#nodes').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('tr');if(r){sel=+r.dataset.i;render()}}});
+$('#bBlind').onclick=()=>{
+  if(nodes.some(n=>n.blind))nodes.forEach(n=>n.blind=false);
+  else{const n=nodes[Math.random()*nodes.length|0];n.blind=true;n.last=Date.now();sel=nodes.indexOf(n)}
+  render();
+};
+$('#bTamper').onclick=()=>{
+  const all=blocks.flatMap(b=>b.leaves);
+  if(all.some(l=>l.orig)){all.forEach(l=>{if(l.orig){l.text=l.orig;delete l.orig}})}
+  else if(all.length){const ev=all.filter(l=>l.sig),pool=ev.length?ev:all,l=pool[Math.random()*pool.length|0];l.orig=l.text;l.text+=' (edited)'}
+  verify();
+};
+$('#bVerify').onclick=()=>verify(true);
+
+render();
+setInterval(tick,1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node / frontend build artifacts
+node_modules/
+.env
+.env.*
+.npm/
+
+# Local server / logs
+*.log
+
+# Vercel
+.vercel/
+
+# Optional: local static output
+/dist/
+/build/
