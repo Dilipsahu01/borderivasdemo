@@ -6,6 +6,16 @@
       "source": "/prototype.html",
       "destination": "/",
       "statusCode": 301
+    },
+    {
+      "source": "/demo",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/demo/(.*)",
+      "destination": "/",
+      "statusCode": 301
     }
   ]
 }
